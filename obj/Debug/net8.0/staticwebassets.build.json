@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "CI6I6RNRYFIfiJvaRCzDAX9msnRXv0DG3Sod7rjukQ0=",
+  "Source": "Yota-backend",
+  "BasePath": "_content/Yota-backend",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
