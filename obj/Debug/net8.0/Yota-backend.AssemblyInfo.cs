@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Yota-backend")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2d321f6b33165c26cf7063a0069a356952c52a2c")]
 [assembly: System.Reflection.AssemblyProductAttribute("Yota-backend")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Yota-backend")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
