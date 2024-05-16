@@ -5,9 +5,10 @@ namespace Yota_backend.Services.Interface;
 
 public interface IAlbumService
 {
-    Task AddAlbum(AlbumDto album, CancellationToken token);
-    Task<Album> GetAlbumById(Guid id, CancellationToken token);
-    Task<IEnumerable<Album>> GetAlbumsByArtistId(Guid ArtistId, CancellationToken token);
-    Task UpdateAlbum(Guid id, AlbumDto album, CancellationToken token);
+    Task AddAlbum(AlbumRequest request, CancellationToken token);
+    Task<AlbumDto> GetAlbumById(Guid id, CancellationToken token);
+    IEnumerable<AlbumDto> GetAlbumsByArtistId(Guid artistId);
+    Task UpdateAlbum(Guid id, AlbumRequest album, CancellationToken token);
     Task DeleteAlbum(Guid id, CancellationToken token);
+    Task<AlbumCoverDto?> GetAlbumCover(Guid id, CancellationToken token);
 }

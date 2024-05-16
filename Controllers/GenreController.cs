@@ -19,34 +19,32 @@ public class GenreController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<Genre>> GetGenre(Guid id, CancellationToken token)
     {
-        var genre = await _service.GetGenreById(id, token);
-
-        if (genre == null)
+        try
+        {
+            var genre = await _service.GetGenreById(id, token);
+            return Ok(genre);
+        }
+        catch (KeyNotFoundException)
         {
             return NotFound();
         }
-
-        return Ok(genre);
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Genre>>> GetGenres(CancellationToken token)
+    public ActionResult<IEnumerable<Genre>> GetGenres(CancellationToken token)
     {
-        var genres = await _service.GetGenres(token);
-
-        return Ok(genres);
+        return Ok(_service.GetGenres());
     }
 
     [HttpPost]
-    public async Task<ActionResult<Genre>> PostGenre(GenreDto genre, CancellationToken token)
+    public async Task<ActionResult<Genre>> PostGenre(GenreRequest genre, CancellationToken token)
     {
         await _service.AddGenre(genre, token);
-
         return Created();
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutGenre(Guid id, GenreDto genre, CancellationToken token)
+    public async Task<IActionResult> PutGenre(Guid id, GenreRequest genre, CancellationToken token)
     {
         try
         {

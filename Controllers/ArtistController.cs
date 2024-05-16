@@ -31,23 +31,20 @@ public class ArtistController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Artist>>> GetArtists(CancellationToken token)
-    {
-        var artists = await _service.GetArtists(token);
-
-        return Ok(artists);
+    public ActionResult<IEnumerable<Artist>> GetArtists()
+    { 
+        return Ok(_service.GetArtists());
     }
 
     [HttpPost]
-    public async Task<ActionResult<Artist>> PostArtist(ArtistDto artist, CancellationToken token)
+    public async Task<ActionResult<Artist>> PostArtist(ArtistRequest artist, CancellationToken token)
     {
         await _service.AddArtist(artist, token);
-
         return Created();
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutArtist(Guid id, ArtistDto artist, CancellationToken token)
+    public async Task<IActionResult> PutArtist(Guid id, ArtistRequest artist, CancellationToken token)
     {
         try
         {

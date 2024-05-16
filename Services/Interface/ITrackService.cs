@@ -5,12 +5,14 @@ namespace Yota_backend.Services.Interface;
 
 public interface ITrackService
 {
-    Task<Track> GetTrackById(Guid id, CancellationToken token);
-    Task<IEnumerable<Track>> GetTracksByAlbumId(Guid AlbumId, CancellationToken token);
-    Task<IEnumerable<Track>> GetTracksByGenreId(Guid GenreId, CancellationToken token);
-    Task<IEnumerable<Track>> GetTracksByArtistId(Guid ArtistId, CancellationToken token);
-    Task DeleteTrack(Track track, CancellationToken token);
-    Task AddTrack(Track track, CancellationToken token);
-    Task UpdateTrack(Track track, CancellationToken token);
-    Task<Track> MountNewTrack(TrackDto track, CancellationToken token);
+    Task<TrackDto> GetTrackById(Guid id, CancellationToken token);
+    IEnumerable<TrackDto> GetTracksByAlbumId(Guid albumId);
+    IEnumerable<TrackDto> GetTracksByGenreId(Guid genreId);
+    IEnumerable<TrackDto> GetTracksByArtistId(Guid artistId);
+    IEnumerable<TrackDto> GetTracksByPlaylistId(Guid playlistId);
+    Task DeleteTrack(Guid trackId, CancellationToken token);
+    Task AddTrack(TrackRequest track, CancellationToken token);
+    Task UpdateTrack(Guid id, TrackRequest track, CancellationToken token);
+    IEnumerable<byte[]> GetTrackFilesByPlaylistId(Guid playlistId);
+    Task<byte[]> GetTrackFileById(Guid trackId, CancellationToken token);
 }

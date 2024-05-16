@@ -12,11 +12,15 @@ public class PlaylistConfiguration : IEntityTypeConfiguration<Playlist>
 
         builder.HasKey(x => x.Id);
 
-        builder.Property(x => x.Name)
+        builder.Property(x => x.Title)
             .IsRequired()
             .HasMaxLength(256);
 
         builder.Property(x => x.Description)
-            .HasMaxLength(1000);
+            .HasMaxLength(500);
+        
+        builder.Property(x => x.ImagePath)
+            .IsRequired()
+            .HasMaxLength(500);
     }
 }

@@ -1,6 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.Text;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Yota_backend.ApplicationDbContext.Interface;
+using Yota_backend.Commons;
 using Yota_backend.Controllers.Dto;
 using Yota_backend.Model;
 using Yota_backend.Services.Interface;
@@ -11,49 +12,55 @@ namespace Yota_backend.Services;
 public class AlbumService : IAlbumService
 {
     private readonly IAppDbContext _context;
+    private readonly IMapper _mapper;
 
-    public AlbumService(IAppDbContext context)
+    public AlbumService(IAppDbContext context, IMapper mapper)
     {
         _context = context;
+        _mapper = mapper;
     }
 
-    public async Task<Album> GetAlbumById(Guid id, CancellationToken token)
+    public async Task<AlbumDto> GetAlbumById(Guid id, CancellationToken token)
     {
         var album = await _context.Albums
             .AsNoTracking()
             .Where(a => a.Id == id)
             .FirstOrDefaultAsync(token);
 
-        return album;
+        return _mapper.Map<AlbumDto>(album);
     }
 
-    public async Task<IEnumerable<Album>> GetAlbumsByArtistId(Guid ArtistId, CancellationToken token)
+    public IEnumerable<AlbumDto> GetAlbumsByArtistId(Guid artistId)
     {
-        var albums = await _context.Albums
+        var albums = _context.Albums
             .AsNoTracking()
-            .Where(a => a.ArtistId == ArtistId)
-            .ToListAsync(token);
+            .Where(a => a.ArtistId == artistId);
 
-        return albums;
+        return _mapper.ProjectTo<AlbumDto>(albums);
     }
 
-    public async Task AddAlbum(AlbumDto album, CancellationToken token)
+    public async Task AddAlbum(AlbumRequest request, CancellationToken token)
     {
-        var blob = await CryptTools.FromFileToStringByBytes(album.Image);
+        var coverFile = request.Image;
 
-        var newAlbum = new Album
+        var imagePath = Constants.DefaultAlbumCoverImage;
+        if (coverFile is not null)
         {
-            Id = Guid.NewGuid(),
-            Title = album.Title,
-            ArtistId = album.ArtistId,
-            ImageBlob = CryptTools.AESEncrypt(blob)
+            imagePath = Constants.AlbumCoverPath + coverFile.FileName;
+        }
+
+        var album = new Album
+        {
+            ArtistId = request.ArtistId,
+            Title = request.Title,
+            ImagePath = imagePath
         };
 
-        await _context.Albums.AddAsync(newAlbum, token);
+        _context.Albums.Add(album);
         await _context.SaveChangesAsync(token);
     }
 
-    public async Task UpdateAlbum(Guid id, AlbumDto album, CancellationToken token)
+    public async Task UpdateAlbum(Guid id, AlbumRequest album, CancellationToken token)
     {
         var albumToUpdate = await _context.Albums
             .Where(a => a.Id == id)
@@ -77,12 +84,20 @@ public class AlbumService : IAlbumService
             .Where(a => a.Id == id)
             .FirstOrDefaultAsync(token);
 
-        if (albumToDelete == null)
-        {
-            throw new KeyNotFoundException();
-        }
+        if (albumToDelete == null) throw new KeyNotFoundException();
 
         _context.Albums.Remove(albumToDelete);
         await _context.SaveChangesAsync(token);
+    }
+
+    public async Task<AlbumCoverDto?> GetAlbumCover(Guid id, CancellationToken token)
+    {
+        var album = await _context.Albums.FindAsync([id, token], cancellationToken: token);
+        var path = album?.ImagePath;
+        var image = string.IsNullOrEmpty(path)
+            ? DefaultByteFiles.GetDefaultAlbumCoverBytes()
+            : await File.ReadAllBytesAsync(path, token);
+        
+        return new AlbumCoverDto { Image = image };
     }
 }

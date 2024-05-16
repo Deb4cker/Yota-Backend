@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Yota_backend.ApplicationDbContext.Interface;
+using Yota_backend.Commons;
 using Yota_backend.Controllers.Dto;
 using Yota_backend.Model;
 using Yota_backend.Services.Interface;
@@ -7,77 +9,64 @@ using Yota_backend.Utils;
 
 namespace Yota_backend.Services;
 
-public class TrackService : ITrackService
+public class TrackService (IAppDbContext context, IMapper mapper) : ITrackService
 {
-    private readonly IAppDbContext _context;
-
-    public TrackService(IAppDbContext context)
+    public async Task AddTrack(TrackRequest track, CancellationToken token)
     {
-        _context = context;
+        var newTrack = MountNewTrack(track);
+        context.Tracks.Add(newTrack);
+        await context.SaveChangesAsync(token);
     }
 
-    public async Task AddTrack(Track track, CancellationToken token)
+    public async Task<TrackDto> GetTrackById(Guid id, CancellationToken token)
     {
-        _context.Tracks.Add(track);
-        await _context.SaveChangesAsync(token);
-
-        return;
+        var track = await context.Tracks.FindAsync([id, token], token);
+        return mapper.Map<TrackDto>(track);
     }
-
-    public async Task DeleteTrack(Track track, CancellationToken token)
+    
+    public IEnumerable<TrackDto> GetTracksByPlaylistId(Guid playlistId)
     {
-        _context.Tracks.Remove(track);
-        await _context.SaveChangesAsync(token);
-        
-        return;
-    }
-
-    public async Task<Track> GetTrackById(Guid id, CancellationToken token)
-    {
-        var track = await _context.Tracks
+        var tracks = context.Tracks
             .AsNoTracking()
-            .Where(t => t.Id == id)
-            .FirstOrDefaultAsync(token);
+            .Where(t => t.AlbumId == playlistId);
 
-        return track;
+        return mapper.ProjectTo<TrackDto>(tracks);
     }
 
-    public async Task<IEnumerable<Track>> GetTracksByAlbumId(Guid albumId, CancellationToken token)
+    public IEnumerable<TrackDto> GetTracksByAlbumId(Guid albumId)
     {
-        var tracks = await _context.Tracks
+        var tracks = context.Tracks
             .AsNoTracking()
-            .Where(t => t.AlbumId == albumId)
-            .ToListAsync(token);
+            .Where(t => t.AlbumId == albumId);
 
-        return tracks;
+        return mapper.ProjectTo<TrackDto>(tracks);
     }
 
-    public Task<IEnumerable<Track>> GetTracksByArtistId(Guid ArtistId, CancellationToken token)
+    public IEnumerable<TrackDto> GetTracksByGenreId(Guid genreId)
     {
-        throw new NotImplementedException();
-    }
-
-    public async Task<IEnumerable<Track>> GetTracksByArtistlistId(Guid artistId, CancellationToken token)
-    {
-        var tracks = await _context.Tracks
+        var tracks = context.Tracks
             .AsNoTracking()
-            .Where(t => t.ArtistId == artistId)
-            .ToListAsync(token);
+            .Where(t => t.GenreId == genreId);
 
-        return tracks;
-    }
+        return mapper.ProjectTo<TrackDto>(tracks);    }
 
-    public async Task<IEnumerable<Track>> GetTracksByGenreId(Guid genreId, CancellationToken token)
+    public IEnumerable<TrackDto> GetTracksByArtistId(Guid artistId)
     {
-        var tracks = await _context.Tracks
+        var tracks = context.Tracks
             .AsNoTracking()
-            .Where(t => t.GenreId == genreId)
-            .ToListAsync(token);
+            .Where(t => t.ArtistId == artistId);
 
-        return tracks;
+        return mapper.ProjectTo<TrackDto>(tracks);    
     }
 
-    public async Task<Track> MountNewTrack(TrackDto track, CancellationToken token)
+    public async Task DeleteTrack(Guid id, CancellationToken token)
+    {
+        var track = await context.Tracks.FindAsync([id, token], token);
+        if(track is not null) context.Tracks.Remove(track);
+        await context.SaveChangesAsync(token);
+    }
+
+    private Track MountNewTrack(TrackRequest track)
     {
         var isValidFormat = AudioExtension.IsAudioFormat(track.File.FileName);
         if (!isValidFormat)
@@ -87,30 +76,51 @@ public class TrackService : ITrackService
 
         var milliseconds = AudioExtension.GetAudioDuration(track.File);
         var bytes = (int)track.File.Length;
-        var byteString = await CryptTools.FromFileToStringByBytes(track.File);
-        var AES = CryptTools.AESEncrypt(byteString);
-
+        var path = Constants.MusicFilePath + track.File.FileName;
+        
         return new Track
         {
             Name = track.Name,
+            Composer = track.Composer,
             ArtistId = track.ArtistId,
             AlbumId = track.AlbumId,
             GenreId = track.GenreId,
             Milliseconds = milliseconds,
             Bytes = bytes,
-            AES = AES
+            FilePath = path
         };
     }
 
-    public async Task UpdateTrack(Track track, CancellationToken token)
+    public async Task UpdateTrack(Guid id, TrackRequest request, CancellationToken token)
     {
-        var record = await GetTrackById(track.Id, token);
+        var record = await context.Tracks.FindAsync([id, token]);
 
-        if (record != null)
+        if (record is not null)
         {
-            record = track;
+            record.Name = request.Name;
+            record.AlbumId = request.AlbumId;
+            record.ArtistId = request.ArtistId;
+            record.GenreId = request.GenreId;
+            record.Composer = request.Composer;
         }
-        await _context.SaveChangesAsync(token);
-        return; 
+        
+        await context.SaveChangesAsync(token);
+    }
+
+    public IEnumerable<byte[]> GetTrackFilesByPlaylistId(Guid playlistId)
+    {
+        var playlist = context.Playlists.Find(playlistId);
+        var tracks = playlist.Tracks;
+        List<byte[]> files = [];
+        files.AddRange(tracks.Select(track => File.ReadAllBytes(track.FilePath)));
+
+        return files;
+    }
+
+    public async Task<byte[]> GetTrackFileById(Guid trackId, CancellationToken token)
+    {
+        var track = await context.Tracks.FindAsync([trackId, token], token);
+        
+        return await File.ReadAllBytesAsync(track.FilePath);
     }
 }

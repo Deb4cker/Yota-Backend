@@ -25,7 +25,7 @@ public class TrackConfiguration : IEntityTypeConfiguration<Track>
         builder.Property(t => t.Milliseconds)
             .IsRequired();
 
-        builder.Property(t => t.AES)
+        builder.Property(t => t.FilePath)
             .IsRequired();
 
         builder.Property(t => t.ArtistId)

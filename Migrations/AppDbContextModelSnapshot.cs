@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Yota_backend.ApplicationDbContext;
 
-
 #nullable disable
 
 namespace Yota_backend.Migrations
@@ -47,9 +46,10 @@ namespace Yota_backend.Migrations
                     b.Property<Guid>("ArtistId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("ImageBlob")
+                    b.Property<string>("ImagePath")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -102,16 +102,21 @@ namespace Yota_backend.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("Description")
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)");
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
-                    b.Property<string>("ImageBlob")
-                        .HasColumnType("text");
+                    b.Property<string>("ImagePath")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -124,22 +129,22 @@ namespace Yota_backend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("AES")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<Guid>("AlbumId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("ArtistId")
                         .HasColumnType("uuid");
 
-                    b.Property<int>("Bytes")
-                        .HasColumnType("integer");
+                    b.Property<long>("Bytes")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("Composer")
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<Guid>("GenreId")
                         .HasColumnType("uuid");

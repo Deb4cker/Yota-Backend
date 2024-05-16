@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Yota_backend.ApplicationDbContext;
 using Yota_backend.ApplicationDbContext.Interface;
+using Yota_backend.Mapper;
 using Yota_backend.Services;
 using Yota_backend.Services.Interface;
 
@@ -17,6 +18,7 @@ app.UseHttpsRedirection();
 app.MapControllers();
 app.UseAuthorization();
 app.Run();
+return;
 
 //***********************************************************************************************//
 
@@ -31,10 +33,12 @@ static void ConfigureServices(WebApplicationBuilder builder)
 
     builder.Services.AddScoped<IAppDbContext, AppDbContext>();
 
+    builder.Services.AddAutoMapper(typeof(MapProfile));
     builder.Services.AddScoped<IPlaylistService, PlaylistService>();
     builder.Services.AddScoped<IAlbumService, AlbumService>();
     builder.Services.AddScoped<IArtistService, ArtistService>();
     builder.Services.AddScoped<IGenreService, GenreService>();
     builder.Services.AddScoped<ITrackService, TrackService>();
-
+    builder.Services.AddScoped<ICryptographyService, CryptographyService>();
+    
 }

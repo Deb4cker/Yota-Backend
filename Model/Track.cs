@@ -7,7 +7,7 @@ public class Track
     public string? Composer { get; set; }
     public long Milliseconds { get; set; }
     public long Bytes { get; set; }
-    public string AES { get; set; }
+    public string FilePath { get; set; }
 
     public Guid ArtistId { get; set; }
     public virtual Artist Artist { get; set; }

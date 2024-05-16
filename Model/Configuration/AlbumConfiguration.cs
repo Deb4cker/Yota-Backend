@@ -15,5 +15,9 @@ public class AlbumConfiguration : IEntityTypeConfiguration<Album>
         builder.Property(x => x.Title)
             .IsRequired()
             .HasMaxLength(100);
+
+        builder.Property(x => x.ImagePath)
+            .IsRequired()
+            .HasMaxLength(500);
     }
 }

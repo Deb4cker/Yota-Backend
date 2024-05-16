@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Yota_backend.ApplicationDbContext.Interface;
 using Yota_backend.Controllers.Dto;
 using Yota_backend.Model;
@@ -9,10 +10,11 @@ namespace Yota_backend.Services;
 public class ArtistService : IArtistService
 {
     private readonly IAppDbContext _context;
-
-    public ArtistService(IAppDbContext context)
+    private readonly IMapper _mapper;
+    public ArtistService(IAppDbContext context, IMapper mapper)
     {
         _context = context;
+        _mapper = mapper;
     }
 
     public async Task<Artist> GetArtistById(Guid id, CancellationToken token)
@@ -25,26 +27,23 @@ public class ArtistService : IArtistService
         return artist;
     }
 
-    public async Task<IEnumerable<Artist>> GetArtists(CancellationToken token)
+    public IEnumerable<ArtistDto> GetArtists()
     {
-        var artists = await _context.Artists
-            .AsNoTracking()
-            .ToListAsync(token);
+        var artists = _context.Artists
+            .AsNoTracking();
 
-        return artists;
+        return _mapper.ProjectTo<ArtistDto>(artists);
     }
 
-    public async Task AddArtist(ArtistDto artist, CancellationToken token)
+    public async Task AddArtist(ArtistRequest artist, CancellationToken token)
     {
         var newArtist = new Artist {Name = artist.Name};  
 
         _context.Artists.Add(newArtist);
         await _context.SaveChangesAsync(token);
-
-        return;
     }
 
-    public async Task UpdateArtist(Guid id, ArtistDto artist, CancellationToken token)
+    public async Task UpdateArtist(Guid id, ArtistRequest artist, CancellationToken token)
     {
         var record = await _context.Artists
             .Where(a => a.Id == id)
@@ -53,15 +52,11 @@ public class ArtistService : IArtistService
         record.Name = artist.Name;
 
         await _context.SaveChangesAsync(token);
-
-        return;
     }
 
     public async Task DeleteArtist(Artist artist, CancellationToken token)
     {
         _context.Artists.Remove(artist);
         await _context.SaveChangesAsync(token);
-
-        return;
     }
 }

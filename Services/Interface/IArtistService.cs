@@ -6,7 +6,7 @@ namespace Yota_backend.Services.Interface;
 public interface IArtistService
 {
     Task<Artist> GetArtistById(Guid id, CancellationToken token);
-    Task<IEnumerable<Artist>> GetArtists(CancellationToken token);
-    Task AddArtist(ArtistDto artist, CancellationToken token);
-    Task UpdateArtist(Guid id, ArtistDto artist, CancellationToken token);
+    IEnumerable<ArtistDto> GetArtists();
+    Task AddArtist(ArtistRequest artist, CancellationToken token);
+    Task UpdateArtist(Guid id, ArtistRequest artist, CancellationToken token);
 }

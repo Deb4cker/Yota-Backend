@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Yota_backend.Controllers.Dto;
 using Yota_backend.Model;
 using Yota_backend.Services.Interface;
@@ -20,69 +19,58 @@ namespace Yota_backend.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Track>> GetTrack(Guid id, CancellationToken token)
         {
-            var track = await _trackService.GetTrackById(id, token);
-
-            if (track == null)
+            try
+            {
+                var track = await _trackService.GetTrackById(id, token);
+                return Ok(track);
+            }
+            catch (KeyNotFoundException)
             {
                 return NotFound();
             }
-
-            return Ok(track);
         }
 
         [HttpPost]
-        public async Task<ActionResult<Track>> PostTrack(TrackDto track, CancellationToken token)
+        public async Task<ActionResult> CreateTrack(TrackRequest track, CancellationToken token)
         {
-            var mountedTrack = await _trackService.MountNewTrack(track, token);
-            await _trackService.AddTrack(mountedTrack, token);
-
-            return CreatedAtAction("GetTrack", new { id = mountedTrack.Id }, track);
+            await _trackService.AddTrack(track, token);
+            return Ok();
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutTrack(Guid id, Track track, CancellationToken token)
+        public async Task<ActionResult> PutTrack(Guid id, TrackRequest track, CancellationToken token)
         {
-            if (id != track.Id)
-            {
-                return BadRequest();
-            }
-
-            try
-            {
-                await _trackService.UpdateTrack(track, token);
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!await TrackExists(id, token))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            await _trackService.UpdateTrack(id, track, token);
+            return Ok();
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteTrack(Guid id, CancellationToken token)
+        public async Task<ActionResult> DeleteTrack(Guid id, CancellationToken token)
         {
-            var track = await _trackService.GetTrackById(id, token);
-            if (track == null)
-            {
-                return NotFound();
-            }
-
-            await _trackService.DeleteTrack(track, token);
-
+            await _trackService.DeleteTrack(id, token);
             return NoContent();
         }
-
-        private async Task<bool> TrackExists(Guid id, CancellationToken token)
+        
+        [HttpGet("file/{id}")]
+        public async Task <ActionResult<byte[]>> GetMusicFileById(Guid id, CancellationToken token)
         {
-            return await _trackService.GetTrackById(id, token) != null;
+            var bytes = await _trackService.GetTrackFileById(id, token);
+            return File(bytes, "application/octet-stream", "track.mp3");
+        }
+
+        [HttpGet("files/{id}")]
+        public ActionResult<IEnumerable<byte[]>> GetMusicFilesByPlaylistId(Guid id, CancellationToken token)
+        {
+            var bytes = _trackService.GetTrackFilesByPlaylistId(id);
+
+            List < FileContentResult > contentResults= [];
+            var count = 0;
+
+            contentResults.AddRange(bytes.Select(track =>
+                new FileContentResult(track, "application/octet-stream") 
+                    { FileDownloadName = $"track{++count}.mp3" }
+            ));
+            return Ok(contentResults);
         }   
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Yota_backend.ApplicationDbContext.Interface;
 using Yota_backend.Controllers.Dto;
 using Yota_backend.Model;
@@ -9,10 +10,12 @@ namespace Yota_backend.Services;
 public class GenreService : IGenreService
 {
     private readonly IAppDbContext _context;
+    private readonly IMapper _mapper;
 
-    public GenreService(IAppDbContext context)
+    public GenreService(IAppDbContext context, IMapper mapper)
     {
         _context = context;
+        _mapper = mapper;
     }
 
     public async Task<Genre> GetGenreById(Guid id, CancellationToken token)
@@ -20,21 +23,20 @@ public class GenreService : IGenreService
         var genre = await _context.Genres
             .AsNoTracking()
             .Where(a => a.Id == id)
-            .FirstOrDefaultAsync(token);
-
+            .FirstOrDefaultAsync(token) ?? throw new KeyNotFoundException();
+            
         return genre;
     }
 
-    public async Task<IEnumerable<Genre>> GetGenres(CancellationToken token)
+    public IEnumerable<GenreDto> GetGenres()
     {
-        var genres = await _context.Genres
-            .AsNoTracking()
-            .ToListAsync(token);
+        var genres = _context.Genres
+            .AsNoTracking();
 
-        return genres;
+        return _mapper.ProjectTo<GenreDto>(genres) ;
     }
 
-    public async Task AddGenre(GenreDto genre, CancellationToken token)
+    public async Task AddGenre(GenreRequest genre, CancellationToken token)
     {
         var newGenre = new Genre
         {
@@ -45,7 +47,7 @@ public class GenreService : IGenreService
         await _context.SaveChangesAsync(token);
     }
 
-    public async Task UpdateGenre(Guid id, GenreDto genre, CancellationToken token)
+    public async Task UpdateGenre(Guid id, GenreRequest genre, CancellationToken token)
     {
         var genreToUpdate = await _context.Genres
             .Where(a => a.Id == id)
@@ -66,13 +68,8 @@ public class GenreService : IGenreService
     {
         var genreToDelete = await _context.Genres
             .Where(a => a.Id == id)
-            .FirstOrDefaultAsync(token);
-
-        if (genreToDelete == null)
-        {
-            throw new KeyNotFoundException();
-        }
-
+            .FirstOrDefaultAsync(token) ?? throw new KeyNotFoundException();
+            
         _context.Genres.Remove(genreToDelete);
         await _context.SaveChangesAsync(token);
     }
