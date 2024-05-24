@@ -51,14 +51,14 @@ namespace Yota_backend.Controllers
             return NoContent();
         }
         
-        [HttpGet("file/{id}")]
+        [HttpGet("File/{id:guid}")]
         public async Task <ActionResult<byte[]>> GetMusicFileById(Guid id, CancellationToken token)
         {
             var bytes = await _trackService.GetTrackFileById(id, token);
             return File(bytes, "application/octet-stream", "track.mp3");
         }
 
-        [HttpGet("files/{id}")]
+        [HttpGet("Files/{id}")]
         public ActionResult<IEnumerable<byte[]>> GetMusicFilesByPlaylistId(Guid id, CancellationToken token)
         {
             var bytes = _trackService.GetTrackFilesByPlaylistId(id);
@@ -71,6 +71,13 @@ namespace Yota_backend.Controllers
                     { FileDownloadName = $"track{++count}.mp3" }
             ));
             return Ok(contentResults);
-        }   
+        }
+        
+        [HttpGet("Filename/{name}")]
+        public async Task <ActionResult<byte[]>> GetMusicFileByName(string name, CancellationToken token)
+        {
+            var bytes = await _trackService.GetTrackFileByName(name, token);
+            return File(bytes, "application/octet-stream", "track.mp3");
+        }
     }
 }

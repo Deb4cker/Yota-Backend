@@ -210,3 +210,4 @@ C:/Users/ndeba/Desktop/UDESC/6 Semestre/DDM/Yota-backend/Yota-backend/obj/Debug/
 /home/nicolas/Desktop/UDESC/DDM/Yota-Backend/bin/Debug/net8.0/AutoMapper.dll
 /home/nicolas/Desktop/UDESC/DDM/Yota-Backend/bin/Debug/net8.0/Newtonsoft.Json.dll
 /home/nicolas/Desktop/UDESC/DDM/Yota-Backend/bin/Debug/net8.0/Newtonsoft.Json.Bson.dll
+/home/nicolas/Desktop/UDESC/DDM/Yota-Backend/bin/Debug/net8.0/System.Web.Cors.dll

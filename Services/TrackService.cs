@@ -123,4 +123,10 @@ public class TrackService (IAppDbContext context, IMapper mapper) : ITrackServic
         
         return await File.ReadAllBytesAsync(track.FilePath);
     }
+
+    public async Task<byte[]> GetTrackFileByName(string name, CancellationToken token)
+    {
+        var track = await context.Tracks.FirstOrDefaultAsync(t=> t.Name == name, token);
+        return await File.ReadAllBytesAsync(track.FilePath);
+    }
 }

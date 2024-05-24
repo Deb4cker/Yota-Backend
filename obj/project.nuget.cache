@@ -1,11 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "kk9BQCOFWQZkYWOzA8HccoOIoRS+Yi7UBAIFl6rTu2Fu8nVpx4sEfViimOfGJ5YevXD5nnVD6XqVFUkABtCAew==",
+  "dgSpecHash": "DorkizNoL9nLS8j1lAirHSwM1TmGCOhCLy/SGWzK/mHKfTnY6fSFkiRjNnWQGzJ7COrGiBZQck99L9RB8bmg9A==",
   "success": true,
   "projectFilePath": "/home/nicolas/Desktop/UDESC/DDM/Yota-Backend/Yota-backend.csproj",
   "expectedPackageFiles": [
     "/home/nicolas/.nuget/packages/automapper/13.0.1/automapper.13.0.1.nupkg.sha512",
     "/home/nicolas/.nuget/packages/humanizer.core/2.14.1/humanizer.core.2.14.1.nupkg.sha512",
+    "/home/nicolas/.nuget/packages/microsoft.aspnet.cors/5.3.0/microsoft.aspnet.cors.5.3.0.nupkg.sha512",
     "/home/nicolas/.nuget/packages/microsoft.bcl.asyncinterfaces/6.0.0/microsoft.bcl.asyncinterfaces.6.0.0.nupkg.sha512",
     "/home/nicolas/.nuget/packages/microsoft.codeanalysis.analyzers/3.3.3/microsoft.codeanalysis.analyzers.3.3.3.nupkg.sha512",
     "/home/nicolas/.nuget/packages/microsoft.codeanalysis.common/4.5.0/microsoft.codeanalysis.common.4.5.0.nupkg.sha512",
@@ -61,6 +62,16 @@
       "warningLevel": 1,
       "message": "Package 'Npgsql' 8.0.2 has a known high severity vulnerability, https://github.com/advisories/GHSA-x9vc-6hfv-hg8c",
       "libraryId": "Npgsql",
+      "targetGraphs": [
+        "net8.0"
+      ]
+    },
+    {
+      "code": "NU1701",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'Microsoft.AspNet.Cors 5.3.0' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1' instead of the project target framework 'net8.0'. This package may not be fully compatible with your project.",
+      "libraryId": "Microsoft.AspNet.Cors",
       "targetGraphs": [
         "net8.0"
       ]

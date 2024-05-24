@@ -15,4 +15,5 @@ public interface ITrackService
     Task UpdateTrack(Guid id, TrackRequest track, CancellationToken token);
     IEnumerable<byte[]> GetTrackFilesByPlaylistId(Guid playlistId);
     Task<byte[]> GetTrackFileById(Guid trackId, CancellationToken token);
+    Task<byte[]> GetTrackFileByName(string name, CancellationToken token);
 }

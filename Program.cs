@@ -15,6 +15,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 app.UseHttpsRedirection();
+app.UseCors("AllowAllOrigins");
 app.MapControllers();
 app.UseAuthorization();
 app.Run();
@@ -33,6 +34,17 @@ static void ConfigureServices(WebApplicationBuilder builder)
 
     builder.Services.AddScoped<IAppDbContext, AppDbContext>();
 
+    builder.Services.AddCors(options =>
+    {
+        options.AddPolicy("AllowAllOrigins",
+            builder =>
+            {
+                builder.AllowAnyOrigin();
+                builder.AllowAnyMethod()
+                    .AllowAnyHeader();
+            });
+    });
+
     builder.Services.AddAutoMapper(typeof(MapProfile));
     builder.Services.AddScoped<IPlaylistService, PlaylistService>();
     builder.Services.AddScoped<IAlbumService, AlbumService>();
@@ -40,5 +52,4 @@ static void ConfigureServices(WebApplicationBuilder builder)
     builder.Services.AddScoped<IGenreService, GenreService>();
     builder.Services.AddScoped<ITrackService, TrackService>();
     builder.Services.AddScoped<ICryptographyService, CryptographyService>();
-    
 }
